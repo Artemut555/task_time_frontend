@@ -39,7 +39,7 @@ const Login = () => {
       .catch( (err) => {
         setLoading(false)
         setError(true);
-        console.err(err)
+        console.error(err)
       });
   }
 
