@@ -5,7 +5,7 @@ import DashboardHeader from "../../components/DashboardHeader";
 // import Footer from "../../components/Footer";
 import jwtDecode from "jwt-decode";
 import * as moment from "moment";
-import RecipeTable from "../../components/RecipeTable";
+import TaskTable from "../../components/TaskTable";
 import FormInput from "../../components/FormInput/FormInput";
 import Button from "../../components/Button/Button";
 import { NotLoggedIn } from "./NotLoggedIn";
@@ -14,13 +14,13 @@ import PopupModal from "../../components/Modal/PopupModal";
 
 const client = new FastAPIClient(config);
 
-const ProfileView = ({ recipes, client, fetchUserRecipes}) => {
+const ProfileView = ({ tasks, client, fetchUserTasks}) => {
 	return (
 		<>
-			<RecipeTable
-				recipes={recipes}
+			<TaskTable
+				tasks={tasks}
 				client={client}
-				fetchUserRecipes={fetchUserRecipes}
+				fetchUserTasks={fetchUserTasks}
 				showUpdate={true}
 			/>
 			
@@ -28,29 +28,29 @@ const ProfileView = ({ recipes, client, fetchUserRecipes}) => {
 	);
 };
 
-const RecipeDashboard = () => {
+const TaskDashboard = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [error, setError] = useState({ label: "", url: "", source: "" });
-	const [recipeForm, setRecipeForm] = useState({
+	const [taskForm, setTaskForm] = useState({
 		label: "",
 		url: "https://",
 		source: "",
 	});
 
 	const [showForm, setShowForm] = useState(false);
-	const [recipes, setRecipes] = useState([]);
+	const [tasks, setTasks] = useState([]);
 
 	const [loading, setLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(true);
 
 	useEffect(() => {
-		fetchUserRecipes();
+		fetchUserTasks();
 	}, []);
 
-	const fetchUserRecipes = () => {
-		client.getUserRecipes().then((data) => {
+	const fetchUserTasks = () => {
+		client.getUserTasks().then((data) => {
 			setRefreshing(false);
-			setRecipes(data?.results);
+			setTasks(data?.results);
 		});
 	};
 
@@ -59,41 +59,41 @@ const RecipeDashboard = () => {
           return regex.test(URL);
         };
 
-	const onCreateRecipe = (e) => {
+	const onCreateTask = (e) => {
 		console.log("CREATING RECIPE");
 		e.preventDefault();
 		setLoading(true);
 		setError(false);
 
-		if (recipeForm.label.length <= 0) {
+		if (taskForm.label.length <= 0) {
 			setLoading(false);
-			return setError({ label: "Please Enter Recipe Label" });
+			return setError({ label: "Please Enter Task Label" });
 		}
-		if (recipeForm.url.length <= 0) {
+		if (taskForm.url.length <= 0) {
 			setLoading(false);
-			return setError({ url: "Please Enter Recipe Url" });
+			return setError({ url: "Please Enter Task Url" });
 		}
-		if (!urlPatternValidation(recipeForm.url)) {
+		if (!urlPatternValidation(taskForm.url)) {
 			setLoading(false);
 			return setError({ url: "Please Enter Valid URL" });
 		}
-		if (recipeForm.source.length <= 0) {
+		if (taskForm.source.length <= 0) {
 			setLoading(false);
-			return setError({ source: "Please Enter Recipe Source" });
+			return setError({ source: "Please Enter Task Description" });
 		}
 
 
 		client.fetchUser().then((user) => {
 			client
-				.createRecipe(
-					recipeForm.label,
-					recipeForm.url,
-					recipeForm.source,
+				.createTask(
+					taskForm.label,
+					taskForm.url,
+					taskForm.source,
 					user?.id
 				)
 				// eslint-disable-next-line no-unused-vars
 				.then((data) => {  // eslint:ignore
-					fetchUserRecipes();
+					fetchUserTasks();
 					setLoading(false);
 					setShowForm(false);
 				});
@@ -122,7 +122,7 @@ const RecipeDashboard = () => {
 				<DashboardHeader />
 				<div className="container px-5 pt-6 text-center mx-auto lg:px-20">
 					<h1 className="mb-12 text-3xl font-medium text-white">
-						Recipes - Better than all the REST
+						Tasks
 					</h1>
 
 					<button
@@ -131,16 +131,16 @@ const RecipeDashboard = () => {
 							setShowForm(!showForm);
 						}}
 					>
-						Create Recipe
+						Create Task
 					</button>
 
-					<p className="text-base leading-relaxed text-white">Latest recipes</p>
+					<p className="text-base leading-relaxed text-white">Latest tasks</p>
 					<div className="mainViewport text-white">
-						{recipes.length && (
+						{tasks.length && (
 							<ProfileView
-								recipes={recipes}
+								tasks={tasks}
 								client={client}
-								fetchUserRecipes={fetchUserRecipes}
+								fetchUserTasks={fetchUserTasks}
 							/>
 						)}
 					</div>
@@ -149,22 +149,22 @@ const RecipeDashboard = () => {
 			</section>
 			{showForm && (
 				<PopupModal
-					modalTitle={"Create Recipe"}
+					modalTitle={"Create Task"}
 					onCloseBtnPress={() => {
 						setShowForm(false);
 						setError({ fullName: "", email: "", password: "" });
 					}}
 				>
 					<div className="mt-4 text-left">
-						<form className="mt-5" onSubmit={(e) => onCreateRecipe(e)}>
+						<form className="mt-5" onSubmit={(e) => onCreateTask(e)}>
 							<FormInput
 								type={"text"}
 								name={"label"}
 								label={"Label"}
 								error={error.label}
-								value={recipeForm.label}
+								value={taskForm.label}
 								onChange={(e) =>
-									setRecipeForm({source: recipeForm.source, url: recipeForm.url, label: e.target.value})
+									setTaskForm({source: taskForm.source, url: taskForm.url, label: e.target.value})
 								}
 							/>
 							<FormInput
@@ -172,25 +172,25 @@ const RecipeDashboard = () => {
 								name={"url"}
 								label={"Url"}
 								error={error.url}
-								value={recipeForm.url}
+								value={taskForm.url}
 								onChange={(e) =>
-									setRecipeForm({source: recipeForm.source, url: e.target.value, label: recipeForm.label})
+									setTaskForm({source: taskForm.source, url: e.target.value, label: taskForm.label})
 								}
 							/>
 							<FormInput
 								type={"text"}
 								name={"source"}
-								label={"Source"}
+								label={"Description"}
 								error={error.source}
-								value={recipeForm.source}
+								value={taskForm.source}
 								onChange={(e) =>
-									setRecipeForm({source:  e.target.value, url: recipeForm.url, label: recipeForm.label})
+									setTaskForm({source:  e.target.value, url: taskForm.url, label: taskForm.label})
 								}
 							/>
 							<Button
 								loading={loading}
 								error={error.source}
-								title={"Create Recipe"}
+								title={"Create Task"}
 							/>
 						</form>
 					</div>
@@ -200,4 +200,4 @@ const RecipeDashboard = () => {
 	);
 };
 
-export default RecipeDashboard;
+export default TaskDashboard;

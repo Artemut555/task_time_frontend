@@ -81,45 +81,45 @@ class FastAPIClient {
     return client;
   }
 
-  getRecipe(recipeId) {
-    return this.apiClient.get(`/recipes/${recipeId}`);
+  getTask(taskId) {
+    return this.apiClient.get(`/tasks/${taskId}`);
   }
 
-  getRecipes(keyword) {
-    return this.apiClient.get(`/recipes/search/?keyword=${keyword}&max_results=10`).then(({data}) => {
+  getTasks(keyword) {
+    return this.apiClient.get(`/tasks/search/?keyword=${keyword}&max_results=10`).then(({data}) => {
       return data;
     });
   }
 
-  getUserRecipes() {
-    return this.apiClient.get(`/recipes/my-recipes/`).then(({data}) => {
+  getUserTasks() {
+    return this.apiClient.get(`/tasks/my-tasks/`).then(({data}) => {
       return data;
     });
   }
 
-  createRecipe(label, url, source, submitter_id) {
-    const recipeData = {
+  createTask(label, url, source, submitter_id) {
+    const taskData = {
       label,
       url,
       source,
       submitter_id: submitter_id,
     };
-    return this.apiClient.post(`/recipes/`, recipeData);
+    return this.apiClient.post(`/tasks/`, taskData);
   }
 
-  updateTime(recipe_id, type, submitter_id) {
-    console.log(recipe_id)
+  updateTime(task_id, type, submitter_id) {
+    console.log(task_id)
     console.log(type)
-    const recipeData = {
-      id: recipe_id,
+    const taskData = {
+      id: task_id,
       type: type,
       submitter_id: submitter_id,
     };
-    return this.apiClient.put(`/recipes/`, recipeData);
+    return this.apiClient.put(`/tasks/`, taskData);
   }
 
-  deleteRecipe(recipeId) {
-    return this.apiClient.delete(`/recipes/${recipeId}`);
+  deleteTask(taskId) {
+    return this.apiClient.delete(`/tasks/${taskId}`);
   }
 }
 

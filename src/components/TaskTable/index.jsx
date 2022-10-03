@@ -1,15 +1,15 @@
-import Recipe from "../Recipe";
+import Task from "../Task";
 import React, {useState} from "react";
 import PopupModal from "../Modal/PopupModal";
 import FormInput from "../FormInput/FormInput";
 // import Button from "../Button/Button";
 import * as dayjs from 'dayjs';
 
-const RecipeTable = ({recipes, client}) => {
+const TaskTable = ({tasks, client}) => {
   const [loading] = useState(false);
   const [error] = useState({ label: "", url: "", source: "" });
 
-  const [recipeInfoModal, setRecipeInfoModal] = useState(false)
+  const [taskInfoModal, setTaskInfoModal] = useState(false)
     const getTime = (start_time, finish_time, task_finished) => {
         var start_date = dayjs(start_time)
         var finish_date;
@@ -38,33 +38,33 @@ const RecipeTable = ({recipes, client}) => {
 
 
     const handleClickStart = () => {
-        console.log(recipeInfoModal.id);
+        console.log(taskInfoModal.id);
         console.log("task start");
         client.fetchUser().then((user) => {
             client
                 .updateTime(
-                    recipeInfoModal.id,
+                    taskInfoModal.id,
                     0,
                     user?.id
                 ).then((data) => {  // eslint:ignore
                 console.log(data.data);
-                setRecipeInfoModal(data.data);
+                setTaskInfoModal(data.data);
             });
         });
     };
 
     const handleClickFinish = () => {
-        console.log(recipeInfoModal.id);
+        console.log(taskInfoModal.id);
         console.log("task finish");
         client.fetchUser().then((user) => {
             client
                 .updateTime(
-                    recipeInfoModal.id,
+                    taskInfoModal.id,
                     1,
                     user?.id
                 ).then((data) => {  // eslint:ignore
                 console.log(data.data);
-                setRecipeInfoModal(data.data);
+                setTaskInfoModal(data.data);
             });
         });
     };
@@ -72,26 +72,26 @@ const RecipeTable = ({recipes, client}) => {
     return (
       <>
         <div className="sections-list">
-          {recipes.length && (
-              recipes.map((recipe) => (
-                <Recipe showRecipeInfoModal={() => {
-                    client.getRecipe(recipe.id).then((data) => {  // eslint:ignore
-                        setRecipeInfoModal(data.data);
+          {tasks.length && (
+              tasks.map((task) => (
+                <Task showTaskInfoModal={() => {
+                    client.getTask(task.id).then((data) => {  // eslint:ignore
+                        setTaskInfoModal(data.data);
                     })
 
 
-                }} key={recipe.id} recipe={recipe}  />
+                }} key={task.id} task={task}  />
               ))
           )}
-          {!recipes.length && (
-              <p>No recipes found!</p>
+          {!tasks.length && (
+              <p>No tasks found!</p>
           )}
         </div>
-        {recipeInfoModal && <PopupModal
-						modalTitle={"Recipe Info"}
+        {taskInfoModal && <PopupModal
+						modalTitle={"Task Info"}
 						onCloseBtnPress={() => {
                             console.log("closed info modal");
-							setRecipeInfoModal(false);
+							setTaskInfoModal(false);
 						}}
 					>
 						<div className="mt-4 text-left">
@@ -101,28 +101,28 @@ const RecipeTable = ({recipes, client}) => {
 									type={"text"}
 									name={"label"}
 									label={"Label"}
-									value={recipeInfoModal?.label}
+									value={taskInfoModal?.label}
 								/>
 								<FormInput
 									disabled
 									type={"text"}
 									name={"url"}
 									label={"Url"}
-									value={recipeInfoModal?.url}
+									value={taskInfoModal?.url}
 								/>
 								<FormInput
 									disabled
 									type={"text"}
 									name={"source"}
-									label={"Source"}
-									value={recipeInfoModal?.source}
+									label={"Description"}
+									value={taskInfoModal?.source}
 								/>
                                 <FormInput
                                     disabled
                                     type={"text"}
                                     name={"time"}
                                     label={"Time"}
-                                    value={getTime(recipeInfoModal?.start_time, recipeInfoModal?.finish_time, recipeInfoModal?.task_finished)}
+                                    value={getTime(taskInfoModal?.start_time, taskInfoModal?.finish_time, taskInfoModal?.task_finished)}
                                 />
 							</form>
 
@@ -159,4 +159,4 @@ const RecipeTable = ({recipes, client}) => {
     )
 }
 
-export default RecipeTable;
+export default TaskTable;
